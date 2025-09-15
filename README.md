@@ -8,7 +8,7 @@ Implementation of a notification service that:
 
 * Sends messages to users through a Gateway
 * Implements rate limiting per notification type and user
-* Prevents spam by limiting to *n* messages per minute per user/type combination
+* Prevents spam by limiting to n messages per minute per user/type combination
 
 ## Architecture
 
@@ -29,13 +29,13 @@ Implementation of a notification service that:
 
 ```bash
 # Create virtual environment
-python -m venv venv
+python3 -m venv venv
 
 # Activate environment (Linux/Mac)
 source venv/bin/activate
 
 # Activate environment (Windows)
-venv\Scripts\activate
+venv\Scriptsctivate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -44,7 +44,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python -m src.main
+python3 -m src.main
 ```
 
 ### Expected Output
@@ -87,10 +87,10 @@ pytest tests/test_notification_service.py -v
 
 ```bash
 # Create and activate virtual environment
-python -m venv venv
+python3 -m venv venv
 
 # Windows
-env\Scripts\activate
+env\Scriptsctivate
 
 # Linux/Mac
 source venv/bin/activate
@@ -102,7 +102,7 @@ pip install -r requirements.txt
 pytest --cov=src --cov-report=term-missing
 
 # Run demo application
-python -m src.main
+python3 -m src.main
 
 # (Optional) Verify project structure
 tree notification_service/
@@ -110,21 +110,28 @@ tree notification_service/
 
 ## Expected Results
 
-### Running `python -m src.main`
+### Running `python3 -m src.main`
 
 ```
-INFO:src.gateway.gateway:sending message to user user
-sending message to user user
-INFO:src.gateway.gateway:sending message to user user
-sending message to user user
-WARNING:src.services.notification_service_impl:Rate limit exceeded for news:user
-Rate limit exceeded for user user and type news
-INFO:src.gateway.gateway:sending message to user another user
-sending message to user another user
-INFO:src.gateway.gateway:sending message to user user
-sending message to user user
-```
+=== Notification Service Demo ===
+Testing rate limiting (max 2 per minute per user/type)
 
+Sending news to user...
+✓ Message sent to 'user': news 1
+
+Sending news to user...
+✓ Message sent to 'user': news 2
+
+Sending news to user (should be rate limited)...
+✗ Rate limit exceeded for user 'user' and type 'news'
+
+Sending news to another user...
+✓ Message sent to 'another user': news 1
+
+Sending update to user (different type)...
+✓ Message sent to 'user': update 1
+
+=== Demo Complete ===
 ### Running tests
 
 ```
