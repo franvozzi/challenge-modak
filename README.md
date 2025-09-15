@@ -8,7 +8,8 @@ Implementation of a notification service that:
 
 * Sends messages to users through a Gateway
 * Implements rate limiting per notification type and user
-* Prevents spam by limiting to n messages per minute per user/type combination
+* Prevents spam by enforcing configurable limits per type (e.g., status: 2 per minute, news: 1 per day, marketing: 3 per hour)
+* Rejects requests that exceed the defined limits for each type/user combination
 
 ## Architecture
 
@@ -17,13 +18,13 @@ Implementation of a notification service that:
 * **NotificationService**: Interface defining the send contract
 * **NotificationServiceImpl**: Main business logic with rate limiting
 * **Gateway**: Message delivery mechanism
-* **RateLimiter**: Traffic control using sliding window algorithm
+* **RateLimiter**: Traffic control using sliding window algorithm with configurable rules per type
 
 ### Rate Limiting Strategy
 
 * **Key Format**: `{notification_type}:{user_id}`
-* **Default Limit**: 2 requests per minute per key
-* **Algorithm**: Sliding window with automatic cleanup
+* **Configurable Limits**: Defined per type with custom limits and time windows (e.g., minutes, hours, days)
+* **Algorithm**: Sliding window with automatic cleanup for fair and precise rate control
 
 ## Installation
 
@@ -35,7 +36,7 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Activate environment (Windows)
-venv\ScriptsActivate
+venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -50,11 +51,19 @@ python3 -m src.main
 ### Expected Output
 
 ```
-sending message to user user
-sending message to user user
-Rate limit exceeded for user user and type news
-sending message to user another user
-sending message to user user
+=== Notification Service Demo ===
+Testing rate limiting with multiple rules
+✓ Status 1 sent to user1
+✓ Status 2 sent to user1
+✗ Rate limit exceeded for user user1 and type status
+✓ News 1 sent to user1
+✗ Rate limit exceeded for user user1 and type news
+✓ Marketing 1 sent to user1
+✓ Marketing 2 sent to user1
+✓ Marketing 3 sent to user1
+✗ Rate limit exceeded for user user1 and type marketing
+✓ Status 1 sent to user2
+=== Demo Complete ===
 ```
 
 ## Testing
@@ -72,10 +81,11 @@ pytest tests/test_notification_service.py -v
 
 ## Design Decisions
 
-1. **Rate Limiting**: Chose sliding window over fixed window for fair distribution.
-2. **Modularity**: Separated concerns for easy testing and maintenance.
+1. **Rate Limiting**: Chose sliding window over fixed window for fair distribution and precise control across varying time windows.
+2. **Modularity**: Separated concerns (interface, implementation, utils) for easy testing and maintenance.
 3. **Type Safety**: Used type hints throughout for better code clarity.
-4. **Error Handling**: Comprehensive validation and logging.
+4. **Error Handling**: Comprehensive validation, logging, and explicit rejection via custom exceptions for over-limit requests.
+5. **Extensibility**: Configurable rules allow easy addition of new notification types without code changes.
 
 ## Performance Considerations
 
@@ -90,7 +100,7 @@ pytest tests/test_notification_service.py -v
 python3 -m venv venv
 
 # Windows
-env\ScriptsActivate
+venv\Scripts\activate
 
 # Linux/Mac
 source venv/bin/activate
@@ -114,25 +124,20 @@ tree notification_service/
 
 ```
 === Notification Service Demo ===
-Testing rate limiting (max 2 per minute per user/type)
-
-Sending news to user...
-✓ Message sent to 'user': news 1
-
-Sending news to user...
-✓ Message sent to 'user': news 2
-
-Sending news to user (should be rate limited)...
-✗ Rate limit exceeded for user 'user' and type 'news'
-
-Sending news to another user...
-✓ Message sent to 'another user': news 1
-
-Sending update to user (different type)...
-✓ Message sent to 'user': update 1
-
+Testing rate limiting with multiple rules
+✓ Status 1 sent to user1
+✓ Status 2 sent to user1
+✗ Rate limit exceeded for user user1 and type status
+✓ News 1 sent to user1
+✗ Rate limit exceeded for user user1 and type news
+✓ Marketing 1 sent to user1
+✓ Marketing 2 sent to user1
+✓ Marketing 3 sent to user1
+✗ Rate limit exceeded for user user1 and type marketing
+✓ Status 1 sent to user2
 === Demo Complete ===
 ```
+
 ### Running tests
 
 ```
