@@ -35,7 +35,7 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Activate environment (Windows)
-venv\Scriptsctivate
+venv\ScriptsActivate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -90,7 +90,7 @@ pytest tests/test_notification_service.py -v
 python3 -m venv venv
 
 # Windows
-env\Scriptsctivate
+env\ScriptsActivate
 
 # Linux/Mac
 source venv/bin/activate
@@ -132,6 +132,7 @@ Sending update to user (different type)...
 ✓ Message sent to 'user': update 1
 
 === Demo Complete ===
+```
 ### Running tests
 
 ```
